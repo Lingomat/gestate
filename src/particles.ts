@@ -93,7 +93,6 @@ export class Particles {
     this.sketch = Sketch.create({
       globals: false,
       container: this.htmlelement,
-      eventTarget: this.htmlelement,
       retina: false,
       fullscreen: false,
       autopause: true,
@@ -136,14 +135,16 @@ export class Particles {
     if (!cv) {
       return
     }
-    this.width = Math.floor(rect.width)
-    this.height = Math.floor(rect.height)
-    cv.setAttribute('width', this.width.toString()+'px')
-    cv.setAttribute('height', this.height.toString()+'px')
-    //cv.style.setProperty('width', this.width.toString()+'px')
-    //cv.style.setProperty('height', this.height.toString()+'px')
-    cv.style.setProperty('left', Math.floor(rect.left).toString()+'px')
-    cv.style.setProperty('right', Math.floor(rect.right).toString()+'px')
+    this.width = rect.width
+    this.height = rect.height
+    cv.width = rect.width
+    cv.height = rect.height
+    // cv.setAttribute('width', this.width.toString()+'px')
+    // cv.setAttribute('height', this.height.toString()+'px')
+    cv.style.setProperty('width', this.width.toString()+'px')
+    cv.style.setProperty('height', this.height.toString()+'px')
+    cv.style.setProperty('left', rect.left.toString()+'px')
+    cv.style.setProperty('right', rect.right.toString()+'px')
   }
   start() {
 

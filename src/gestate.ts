@@ -48,7 +48,11 @@ export class Gestate {
     //console.log('gestate init particles')
     this.overlay = document.createElement('div')
     this.overlay.classList.add('gestateoverlay')
-    this.overlay.setAttribute("style", "position: absolute; z-index: 20; border: 1px solid red;")
+    let style = "position: absolute; z-index: 100;"
+    if (this.debug) {
+      style += " border: 1px solid red; box-sizing: border-box;"
+    }
+    this.overlay.setAttribute("style", style)
     this.overlay.addEventListener('touchstart', this.touchEvent.bind(this))
     this.overlay.addEventListener('touchmove', this.touchEvent.bind(this))
     this.overlay.addEventListener('touchend', this.touchEvent.bind(this))
