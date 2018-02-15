@@ -161,13 +161,15 @@ export class Gestate {
   }
   
   resizeMirrorElement() {
-    console.log('gestate resizing')
-    let rect = this.sourceElement.getBoundingClientRect()
-    console.log(rect, this.sourceElement.offsetLeft, this.sourceElement.offsetTop)
-    this.overlay.style.setProperty('width', rect.width.toString()+'px')
-    this.overlay.style.setProperty('height', rect.height.toString()+'px')
-    this.overlay.style.setProperty('top', rect.top.toString()+'px')
-    this.overlay.style.setProperty('left', rect.left.toString()+'px')
+    if (this.sourceElement) {
+      let rect = this.sourceElement.getBoundingClientRect() as DOMRect
+      console.log('gestate resizing', rect)
+      this.overlay.style.setProperty('width', rect.width.toString()+'px')
+      this.overlay.style.setProperty('height', rect.height.toString()+'px')
+      this.overlay.style.setProperty('top', rect.top.toString()+'px')
+      this.overlay.style.setProperty('left', rect.left.toString()+'px')
+      this.particles.resize(rect)
+    }
   }
 
   recordTick(): void {
