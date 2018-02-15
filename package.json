@@ -1,6 +1,6 @@
 {
   "name": "gestate",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Gestate gesture recording/playback library",
   "author": "Mat Bettinson (mat.bettinson@gmail.com)",
   "license": "MIT",
