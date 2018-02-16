@@ -33,7 +33,7 @@ export class Gestate {
     trackTouchIdentifier: null
   }
   gestures: Gesture[] = []
-  overlay: HTMLElement
+  canvas: HTMLCanvasElement
   particles: Particles
   sourceElement: HTMLElement
   debug: boolean = false
@@ -46,34 +46,31 @@ export class Gestate {
   //
    init() {
     //console.log('gestate init particles')
-    this.overlay = document.createElement('div')
-    this.overlay.classList.add('gestateoverlay')
-    let style = "position: absolute; z-index: 100;"
+    this.canvas = document.createElement('canvas')
+    this.canvas.classList.add('gestateoverlay')
+    let style = "position: absolute; z-index: 100; user-select: none; -moz-user-select: none; -webkit-user-select: none;"
     if (this.debug) {
       style += " border: 1px solid red; box-sizing: border-box;"
     }
-    this.overlay.setAttribute("style", style)
-    this.overlay.addEventListener('touchstart', this.touchEvent.bind(this))
-    this.overlay.addEventListener('touchmove', this.touchEvent.bind(this))
-    this.overlay.addEventListener('touchend', this.touchEvent.bind(this))
-    this.overlay.addEventListener('mousedown', this.mouseEvent.bind(this))
-    this.overlay.addEventListener('mouseenter', this.mouseEvent.bind(this))
-    this.overlay.addEventListener('mousemove', this.mouseEvent.bind(this))
-    this.overlay.addEventListener('mouseleave', this.mouseEvent.bind(this))
-    this.overlay.addEventListener('mouseup', this.mouseEvent.bind(this))
+    this.canvas.setAttribute("style", style)
+    this.canvas.addEventListener('touchstart', this.touchEvent.bind(this))
+    this.canvas.addEventListener('touchmove', this.touchEvent.bind(this))
+    this.canvas.addEventListener('touchend', this.touchEvent.bind(this))
+    this.canvas.addEventListener('mousedown', this.mouseEvent.bind(this))
+    this.canvas.addEventListener('mouseenter', this.mouseEvent.bind(this))
+    this.canvas.addEventListener('mousemove', this.mouseEvent.bind(this))
+    this.canvas.addEventListener('mouseleave', this.mouseEvent.bind(this))
+    this.canvas.addEventListener('mouseup', this.mouseEvent.bind(this))
     let body = document.querySelector('body')
-    body.appendChild(this.overlay)
-    this.particles = new Particles(this.overlay)
+    body.appendChild(this.canvas)
+    this.particles = new Particles(this.canvas)
     window.addEventListener('resize', () => {
-      this.resizeMirrorElement()
+      this.resizeCanvas()
     })
   }
 
   destroy() {
-    this.overlay.remove()
-    if (this.particles) {
-      this.particles.destroy()
-    }
+    this.canvas.remove()
   }
  
   //
@@ -82,7 +79,7 @@ export class Gestate {
   record(element: HTMLElement, gtype: string, time: number): void {
     console.log('gestate start()')
     this.sourceElement = element
-    this.resizeMirrorElement()
+    this.resizeCanvas()
     this.state = {
       isPlaying: false,
       isRecording: true
@@ -97,14 +94,14 @@ export class Gestate {
       movingPos: null,
       trackTouchIdentifier: null
     }
-    this.particles.init(true)
+    this.particles.begin(true)
     this.recordTick()
   }
 
   stopRecord(): void {
     console.log('gestate stop()')
     this.state.isRecording = false
-    //this.particles.stop()
+    this.particles.stop()
     if (this.currentGesture) {
       this.finishCurrentGesture()
     }
@@ -126,7 +123,7 @@ export class Gestate {
     if (this.state.isRecording) {
       this.stopRecord()
     }
-    this.particles.start()
+    this.particles.begin()
     this.currentRecording = {
       startTime: new Date(),
       recTimeOffset: time,
@@ -172,15 +169,22 @@ export class Gestate {
     }
   }
   
-  resizeMirrorElement() {
+  resizeCanvas() {
     if (this.sourceElement) {
       let rect = this.sourceElement.getBoundingClientRect() as DOMRect
-      console.log('gestate resizing', rect)
-      this.overlay.style.setProperty('width', rect.width.toString()+'px')
-      this.overlay.style.setProperty('height', rect.height.toString()+'px')
-      this.overlay.style.setProperty('top', rect.top.toString()+'px')
-      this.overlay.style.setProperty('left', rect.left.toString()+'px')
-      this.particles.resize(rect)
+      let crct = this.canvas.getBoundingClientRect() as DOMRect
+      if (rect.width !== crct.width || 
+          rect.height !== crct.height ||
+          rect.top !== crct.top ||
+          rect.left !== crct.left
+        ) {
+          console.log('gestate resizing canvas', rect)
+          this.canvas.style.setProperty('width', rect.width.toString()+'px')
+          this.canvas.style.setProperty('height', rect.height.toString()+'px')
+          this.canvas.style.setProperty('top', rect.top.toString()+'px')
+          this.canvas.style.setProperty('left', rect.left.toString()+'px')
+          this.particles.resize(rect)
+      }
     }
   }
 

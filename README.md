@@ -23,10 +23,16 @@ Based on https://github.com/wix/typescript-boilerplate
 
 ```
 import { Gestate } from 'gestate'
-const gest = new Gestate()
-gest.record(MyElement, 'gesture type', offsetTime)
+const gest = new Gestate({debug: true})
+gest.record(MyHTMLElement, 'gesture type', offsetTime)
 gest.stopRecording()
 gest.getGestures()
 gest.clear()
 ```
+
+## Basic operation notes
+
+Gestate creates a canvas element under the BODY element. When record() is called, 
+the canvas is resized to cover the HTMLElement argument. 
+The canvas captures mouse events and renders the particle effects.
 
