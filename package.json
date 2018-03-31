@@ -5,17 +5,17 @@
   "author": "Mat Bettinson (mat.bettinson@gmail.com)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Lingomat/gestate/issues"
+    "url": "https://github.com/aikuma/gestate/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:Lingomat/gestate.git"
+    "url": "git@github.com:aikuma/gestate.git"
   },
   "files": [
     "dist/src"
   ],
   "testGlob": "./dist/test/**/*.spec.js?(x)",
-  "homepage": "https://github.com/Lingomat/gestate#readme",
+  "homepage": "https://github.com/aikuma/gestate#readme",
   "keywords": [
     "gesture",
     "particles",
