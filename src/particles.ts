@@ -191,23 +191,17 @@ export class Particles {
       spawn(fx, fy, this.SPAWN_MIN, this.SPAWN_MAX)
     } else {
       // if playback, then interpolate between last update
-      let fc = this.getRandomIntInclusive(this.SPAWN_MIN,this.SPAWN_MAX)
+      let fc: number
       if (this.lastParp) {
         let elT = new Date().valueOf() - this.lastParp.time
-        //let tpP = ~~(elT / this.lastParp.particles)
-        //console.log('el:',elT, tpP)
-        if (elT > 50) {
-          console.log('particle: elT > 50, throttling interpolate', elT)
-          fc = 1
-        }
-        // have move so let's interpolate
+        fc = 1 + ~~(60 / (1000/elT)) // scale steps to current frmme rate
         let steps = interpolate(this.lastParp.x, this.lastParp.y, x, y, fc)
         for (let s of steps) {
           let px = ~~(this.width*s.x), py = ~~(this.height*s.y)
-          //this.sketch.spawn(px, py)
-          spawn(px, py)
+          spawn(px, py, this.SPAWN_MIN, this.SPAWN_MAX)
         }
       } else {
+        fc = 1
         // no last move
         spawn(fx, fy, this.SPAWN_MIN, this.SPAWN_MAX)
       }

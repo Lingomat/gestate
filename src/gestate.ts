@@ -16,10 +16,8 @@ export class Gestate {
     isPlaying: boolean,
     isRecording: boolean
   } = { isPlaying: false, isRecording: false}
-  currentGesture: {
-    gesture: Gesture,
-    type: string
-  } = null
+  currentGesture: Gesture = null
+  currentGestureType: string = null
   currentRecording: {
     startTime: Date,
     recTimeOffset: number,
@@ -49,9 +47,9 @@ export class Gestate {
     this.canvas = document.createElement('canvas')
     this.canvas.classList.add('gestateoverlay')
     let style = "position: absolute; z-index: 100; user-select: none; -moz-user-select: none; -webkit-user-select: none;"
-    if (this.debug) {
-      style += " border: 1px solid red; box-sizing: border-box;"
-    }
+    // if (this.debug) {
+    //   style += " border: 1px solid red; box-sizing: border-box;"
+    // }
     this.canvas.setAttribute("style", style)
     this.canvas.addEventListener('touchstart', this.touchEvent.bind(this))
     this.canvas.addEventListener('touchmove', this.touchEvent.bind(this))
@@ -84,7 +82,8 @@ export class Gestate {
       isPlaying: false,
       isRecording: true
     }
-    this.currentGesture = {gesture: null, type: gtype}
+    this.currentGesture = null
+    this.currentGestureType = gtype
     this.currentRecording = {
       startTime: new Date(),
       recTimeOffset: time,
@@ -116,22 +115,32 @@ export class Gestate {
   }
  
   loadGestures(gestures: Gesture[]): void {
+    console.log('loadGestures', gestures)
     this.gestures = gestures
   }
  
-  playGestures(time: Milliseconds) {
+  playGestures(element: HTMLElement, time: Milliseconds) {
+    this.sourceElement = element
+    this.resizeCanvas()
     if (this.state.isRecording) {
       this.stopRecord()
     }
-    this.particles.begin()
     this.currentRecording = {
       startTime: new Date(),
       recTimeOffset: time,
       lastElapsed: time
     }
     this.currentTouch.movingPos = null
-    this.state.isPlaying = true
-    this.playTick()
+    if (!this.state.isPlaying) {
+      this.state.isPlaying = true
+      this.particles.begin(false)
+      this.playTick()
+    }
+  }
+
+  resize(element: HTMLElement) {
+    this.sourceElement = element
+    this.resizeCanvas()
   }
 
   stopPlay(): void {
@@ -178,7 +187,6 @@ export class Gestate {
           rect.top !== crct.top ||
           rect.left !== crct.left
         ) {
-          console.log('gestate resizing canvas', rect)
           this.canvas.style.setProperty('width', rect.width.toString()+'px')
           this.canvas.style.setProperty('height', rect.height.toString()+'px')
           this.canvas.style.setProperty('top', rect.top.toString()+'px')
@@ -198,8 +206,9 @@ export class Gestate {
   }
   
   finishCurrentGesture(): void {
-    this.gestures.push(this.currentGesture.gesture)
-    this.currentGesture.gesture = null
+    console.log('finishing gesture', this.currentGesture)
+    this.gestures.push(this.currentGesture)
+    this.currentGesture = null
     this.currentTouch.movingPos = null
     this.particles.endParp()
   }
@@ -223,12 +232,11 @@ export class Gestate {
       return
     }
     if (e.type === 'touchstart') {
-      console.log('touch start')
       let thisTouch: Touch = e.changedTouches[0]
       this.currentTouch.trackTouchIdentifier = thisTouch.identifier
       let touchPos = getXYFromTouch(thisTouch)
-      this.currentGesture.gesture = {
-        type: this.currentGesture.type,
+      this.currentGesture = {
+        type: this.currentGestureType,
         timeOffset: this.currentRecording.recTimeOffset + this.getElapsed(),
         timeLine: [{
           t: 0,
@@ -243,16 +251,15 @@ export class Gestate {
       let moveTouch = Array.from(e.changedTouches).find(x => x.identifier === this.currentTouch.trackTouchIdentifier)
       if (moveTouch) {
         let touchPos = getXYFromTouch(moveTouch)
-        this.currentGesture.gesture.timeLine.push({
-          t: this.currentRecording.recTimeOffset + this.getElapsed() - this.currentGesture.gesture.timeOffset,
+        this.currentGesture.timeLine.push({
+          t: this.currentRecording.recTimeOffset + this.getElapsed() - this.currentGesture.timeOffset,
           x: touchPos.x,
           y: touchPos.y
         })
         this.currentTouch.movingPos = {x: touchPos.x, y: touchPos.y}
       }
     } else if (e.type === 'touchend') {
-      if (this.currentGesture.gesture) {
-        
+      if (this.currentGesture) {
         let fidx = Array.from(e.changedTouches).findIndex(x => x.identifier === this.currentTouch.trackTouchIdentifier)
         if (fidx !== -1) {
           this.finishCurrentGesture()
@@ -273,17 +280,15 @@ export class Gestate {
       }
     }
     const mouseUp = () => {
-      console.log('mouse up')
       this.finishCurrentGesture()
     }
     if (!this.state.isRecording) {
       return
     }
     if ((e.type === 'mousedown' || e.type === 'mouseenter') && (e.buttons & 1)) {
-      console.log('mouse down')
       let mPos = getXYFromMouse(e)
-      this.currentGesture.gesture = {
-        type: this.currentGesture.type,
+      this.currentGesture = {
+        type: this.currentGestureType,
         timeOffset: this.currentRecording.recTimeOffset + this.getElapsed(),
         timeLine: [{
           t: 0,
@@ -293,13 +298,9 @@ export class Gestate {
       }
       this.currentTouch.movingPos = {x: mPos.x, y: mPos.y}
     } else if (e.type === 'mousemove' && this.currentTouch.movingPos) {
-      // if (!(e.buttons & 1)) {
-      //   mouseUp()
-      //   return
-      // }
       let mPos = getXYFromMouse(e)
-      this.currentGesture.gesture.timeLine.push({
-        t: this.currentRecording.recTimeOffset + this.getElapsed() - this.currentGesture.gesture.timeOffset,
+      this.currentGesture.timeLine.push({
+        t: this.currentRecording.recTimeOffset + this.getElapsed() - this.currentGesture.timeOffset,
         x: mPos.x,
         y: mPos.y
       })
