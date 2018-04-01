@@ -22,12 +22,13 @@ Based on https://github.com/wix/typescript-boilerplate
 ## API example
 
 ```
-import { Gestate } from '@aikuma/gestate'
+import { Gestate, Gesture } from '@aikuma/gestate'
+let gestures: Gesture[] = []
 const gest = new Gestate({debug: true})
 let ele = document.getElementById('image')
 gest.record(ele, 'attention', 0)
 gest.stopRecording()
-gest.getGestures()
+gestures = gest.getGestures()
 gest.clear()
 ```
 
@@ -86,7 +87,8 @@ Returns an array of `Gesture` objects.
 
 ## Gesture data structure
 
-```interface Gesture {
+```
+interface Gesture {
   timeOffset: number
   type?: string
   timeLine: {x: number, y: number, t: number}[]
