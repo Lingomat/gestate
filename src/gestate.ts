@@ -43,7 +43,6 @@ export class Gestate {
   // Lifecycle
   //
    init() {
-    //console.log('gestate init particles')
     this.canvas = document.createElement('canvas')
     this.canvas.classList.add('gestateoverlay')
     let style = "position: absolute; z-index: 100; user-select: none; -moz-user-select: none; -webkit-user-select: none;"
@@ -67,6 +66,12 @@ export class Gestate {
     })
   }
 
+  log(...args) {
+    if (this.debug) {
+      console.log('gestate:', ...args)
+    }
+  }
+
   destroy() {
     this.canvas.remove()
   }
@@ -75,7 +80,7 @@ export class Gestate {
   // Logic
   //
   record(element: HTMLElement, gtype: string, time: number): void {
-    console.log('gestate start()')
+    this.log('record()')
     this.sourceElement = element
     this.resizeCanvas()
     this.state = {
@@ -98,7 +103,7 @@ export class Gestate {
   }
 
   stopRecord(): void {
-    console.log('gestate stop()')
+    this.log('stopRecord()')
     this.state.isRecording = false
     this.particles.stop()
     if (this.currentGesture) {
@@ -107,19 +112,22 @@ export class Gestate {
   }
  
   clearAll(): void {
+    this.log('clearAll()')
     this.gestures = []
   }
  
   getGestures(): Gesture[] {
+    this.log('getGestures()', this.gestures)
     return this.gestures
   }
  
   loadGestures(gestures: Gesture[]): void {
-    console.log('loadGestures', gestures)
+    this.log('loadGestures()', gestures)
     this.gestures = gestures
   }
  
   playGestures(element: HTMLElement, time: Milliseconds) {
+    this.log('playGestures()')
     this.sourceElement = element
     this.resizeCanvas()
     if (this.state.isRecording) {
@@ -139,11 +147,13 @@ export class Gestate {
   }
 
   resize(element: HTMLElement) {
+    this.log('resize()')
     this.sourceElement = element
     this.resizeCanvas()
   }
 
   stopPlay(): void {
+    this.log('stopPlay()')
     this.state.isPlaying = false
     this.particles.stop()
   }
@@ -206,7 +216,7 @@ export class Gestate {
   }
   
   finishCurrentGesture(): void {
-    console.log('finishing gesture', this.currentGesture)
+    this.log('finishing gesture', this.currentGesture)
     this.gestures.push(this.currentGesture)
     this.currentGesture = null
     this.currentTouch.movingPos = null
@@ -246,8 +256,6 @@ export class Gestate {
       }
       this.currentTouch.movingPos = {x: touchPos.x, y: touchPos.y}
     } else if (e.type === 'touchmove') {
-      console.log(e.target
-      )
       let moveTouch = Array.from(e.changedTouches).find(x => x.identifier === this.currentTouch.trackTouchIdentifier)
       if (moveTouch) {
         let touchPos = getXYFromTouch(moveTouch)
