@@ -1,11 +1,11 @@
 # Gestate
 
-A raw gesture recording and playback library. It's primarily used in the IGV activity to record gestures on image slides.
+A raw gesture recording and playback library. It's primarily used in the Image-Gesture-Voice activity to record gestures on image slides.
 
 ### project features
- - Mirrors a given element with an overlay that captures mouse and touch events
- - Renders particle effects when recording and playing
- - Simple data structure of recorded gestures.
+ - Mirrors a given HTML element with a canvas overlay that captures mouse and touch events and ...
+ - ... renders particle effects when recording and playing
+ - Simple data structure of recorded gestures
 
 ## developer documentation
 how to build and test:
@@ -22,7 +22,7 @@ Based on https://github.com/wix/typescript-boilerplate
 ## API example
 
 ```
-import { Gestate } from 'gestate'
+import { Gestate } from '@aikuma/gestate'
 const gest = new Gestate({debug: true})
 let ele = document.getElementById('image')
 gest.record(ele, 'attention', 0)
@@ -30,6 +30,13 @@ gest.stopRecording()
 gest.getGestures()
 gest.clear()
 ```
+
+## Constructor
+
+`const gest = new Gestate(config)`
+
+Optional config currently only has one property, debug, which if set to true will 
+
 
 ## methods
 
@@ -77,13 +84,20 @@ Stops playback of gestures.
 
 Returns an array of `Gesture` objects.
 
-## Basic operation notes
+## Gesture data structure
 
-Gestate creates a canvas element under the BODY element. When record() is called, 
-the canvas is resized to cover the HTMLElement argument. 
-The canvas captures mouse events and renders the particle effects.
+```interface Gesture {
+  timeOffset: number
+  type?: string
+  timeLine: {x: number, y: number, t: number}[]
+}
+```
+
+A Gesture object has a timeOffset property representing the relative time of the gesture since the beginning of gesture recording. The type property is an arbitrary string describing the type of gesture. The timeLine is an array of objects with x and y numbers representing the current coordinates of the touch interaction. 
+
+Note that x and y coordinates range from values 0 to 1. The t number is a relative time offset in Milliseconds from the Gesture timeOffset value.
 
 ## To do
 
-1. Add settings for particle effects.
+1. Add some settings for particle effects.
 2. Implement tests.
