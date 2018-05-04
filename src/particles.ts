@@ -187,26 +187,27 @@ export class Particles {
         }
       }
     }
-    if (this.recordMode) {
-      spawn(fx, fy, this.SPAWN_MIN, this.SPAWN_MAX)
-    } else {
-      // if playback, then interpolate between last update
-      let fc: number
-      if (this.lastParp) {
-        let elT = new Date().valueOf() - this.lastParp.time
-        fc = 1 + ~~(60 / (1000/elT)) // scale steps to current frmme rate
-        let steps = interpolate(this.lastParp.x, this.lastParp.y, x, y, fc)
-        for (let s of steps) {
-          let px = ~~(this.width*s.x), py = ~~(this.height*s.y)
-          spawn(px, py, this.SPAWN_MIN, this.SPAWN_MAX)
-        }
-      } else {
-        fc = 1
-        // no last move
-        spawn(fx, fy, this.SPAWN_MIN, this.SPAWN_MAX)
+    // spawn(fx, fy, this.SPAWN_MIN, this.SPAWN_MAX)
+    //  interpolate between last update (removed record distinction)
+    let fc: number
+    if (this.lastParp) {
+      let elT = new Date().valueOf() - this.lastParp.time
+      fc = 1 + ~~(60 / (1000/elT)) // scale steps to current frmme rate
+      let steps = interpolate(this.lastParp.x, this.lastParp.y, x, y, fc)
+      if (steps.length > 1) {
+        steps = steps.slice(1)
       }
-      this.lastParp = {time: new Date().valueOf(), particles: fc, x: x, y: y}
+      for (let s of steps) {
+        let px = ~~(this.width*s.x), py = ~~(this.height*s.y)
+        spawn(px, py, this.SPAWN_MIN, this.SPAWN_MAX)
+      }
+    } else {
+      fc = 1
+      // no last move
+      spawn(fx, fy, this.SPAWN_MIN, this.SPAWN_MAX)
     }
+    this.lastParp = {time: new Date().valueOf(), particles: fc, x: x, y: y}
+    
     this.lastSpawn = {
       x: fx,
       y: fy,
