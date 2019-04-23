@@ -246,8 +246,6 @@ export class Gestate {
       }
       this.currentTouch.movingPos = {x: touchPos.x, y: touchPos.y}
     } else if (e.type === 'touchmove') {
-      console.log(e.target
-      )
       let moveTouch = Array.from(e.changedTouches).find(x => x.identifier === this.currentTouch.trackTouchIdentifier)
       if (moveTouch) {
         let touchPos = getXYFromTouch(moveTouch)

@@ -102,4 +102,7 @@ Note that x and y coordinates range from values 0 to 1. The t number is a relati
 ## To do
 
 1. Add some settings for particle effects.
-2. Implement tests.
+
+## Changes
+
+0.4.0 removed testing framework since I wasn't using it anyway.
