@@ -1,6 +1,6 @@
 {
   "name": "@aikuma/gestate",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Gestate gesture recording/playback library",
   "author": "Mat Bettinson (mat.bettinson@gmail.com)",
   "license": "MIT",
@@ -28,7 +28,5 @@
   "devDependencies": {
     "typescript": "~3.4.4"
   },
-  "dependencies": {
-    "randomcolor": "^0.5.4"
-  }
+  "dependencies": {}
 }
