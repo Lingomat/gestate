@@ -35,15 +35,18 @@ export class Gestate {
   particles: Particles
   sourceElement: HTMLElement
   debug: boolean = false
+  colors: string[] = null
   constructor(config: any) {
     this.debug = config && config.debug
+      this.colors = (config && config.colors) ? config.colors : null
     this.init()
   }
+  testid: string = Math.round(Math.random()*100).toString()
   // 
   // Lifecycle
   //
    init() {
-    //console.log('gestate init particles')
+    console.log('gestate init()')
     this.canvas = document.createElement('canvas')
     this.canvas.classList.add('gestateoverlay')
     let style = "position: absolute; z-index: 100; user-select: none; -moz-user-select: none; -webkit-user-select: none;"
@@ -61,21 +64,24 @@ export class Gestate {
     this.canvas.addEventListener('mouseup', this.mouseEvent.bind(this))
     let body = document.querySelector('body')
     body.appendChild(this.canvas)
-    this.particles = new Particles(this.canvas)
+    this.particles = new Particles(this.canvas, this.colors)
     window.addEventListener('resize', () => {
+      this.consoleLog('gestate', this.testid, 'resize')
       this.resizeCanvas()
     })
   }
 
   destroy() {
-    this.canvas.remove()
+    let body = document.querySelector('body')
+    body.removeChild(this.canvas)
+    //this.canvas.remove()
   }
  
   //
   // Logic
   //
   record(element: HTMLElement, gtype: string, time: number): void {
-    console.log('gestate start()')
+    this.consoleLog('gestate start()')
     this.sourceElement = element
     this.resizeCanvas()
     this.state = {
@@ -98,7 +104,7 @@ export class Gestate {
   }
 
   stopRecord(): void {
-    console.log('gestate stop()')
+    this.consoleLog('gestate stop()')
     this.state.isRecording = false
     this.particles.stop()
     if (this.currentGesture) {
@@ -115,7 +121,7 @@ export class Gestate {
   }
  
   loadGestures(gestures: Gesture[]): void {
-    console.log('loadGestures', gestures)
+    this.consoleLog('loadGestures', gestures)
     this.gestures = gestures
   }
  
@@ -180,7 +186,9 @@ export class Gestate {
   
   resizeCanvas() {
     if (this.sourceElement) {
+      this.consoleLog('got element for resize', this.sourceElement)
       let rect = this.sourceElement.getBoundingClientRect() as DOMRect
+      this.consoleLog('resizing to', rect)
       let crct = this.canvas.getBoundingClientRect() as DOMRect
       if (rect.width !== crct.width || 
           rect.height !== crct.height ||
@@ -206,7 +214,7 @@ export class Gestate {
   }
   
   finishCurrentGesture(): void {
-    console.log('finishing gesture', this.currentGesture)
+    this.consoleLog('finishing gesture', this.currentGesture)
     this.gestures.push(this.currentGesture)
     this.currentGesture = null
     this.currentTouch.movingPos = null
@@ -307,6 +315,12 @@ export class Gestate {
       mouseUp()
     } else if (e.type === 'mouseleave' && this.currentTouch.movingPos) {
       mouseUp()
+    }
+  }
+
+  consoleLog(...args) {
+    if (this.debug) {
+      console.log('Gestate:', ...args)
     }
   }
    

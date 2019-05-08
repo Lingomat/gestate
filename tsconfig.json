@@ -11,6 +11,7 @@
     "importHelpers": false,
     "noImplicitReturns": true,
     "strictNullChecks": false,
+    "allowSyntheticDefaultImports": true,
     "sourceMap": true,
     "outDir": "dist",
     "typeRoots": [
