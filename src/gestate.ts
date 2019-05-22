@@ -34,11 +34,13 @@ export class Gestate {
   canvas: HTMLCanvasElement
   particles: Particles
   sourceElement: HTMLElement
+  appendElement: HTMLElement
   debug: boolean = false
   colors: string[] = null
   constructor(config: any) {
     this.debug = config && config.debug
-      this.colors = (config && config.colors) ? config.colors : null
+    this.colors = (config && config.colors) ? config.colors : null
+    this.appendElement = (config && config.element) ? config.element : null
     this.init()
   }
   testid: string = Math.round(Math.random()*100).toString()
@@ -62,8 +64,12 @@ export class Gestate {
     this.canvas.addEventListener('mousemove', this.mouseEvent.bind(this))
     this.canvas.addEventListener('mouseleave', this.mouseEvent.bind(this))
     this.canvas.addEventListener('mouseup', this.mouseEvent.bind(this))
-    let body = document.querySelector('body')
-    body.appendChild(this.canvas)
+    if (this.appendElement) {
+      this.appendElement.appendChild(this.canvas)
+    } else {
+      let body = document.querySelector('body')
+      body.appendChild(this.canvas)
+    }
     this.particles = new Particles(this.canvas, this.colors)
     window.addEventListener('resize', () => {
       this.consoleLog('gestate', this.testid, 'resize')

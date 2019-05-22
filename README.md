@@ -36,8 +36,11 @@ gest.clear()
 
 `const gest = new Gestate(config)`
 
-Optional config currently only has one property, debug, which if set to true will 
+Optional config has three properties:
 
+* debug: boolean --- print debug information
+* colors: string[] --- array of RGB colours to use for visualisation in format \#rrggbb.
+* element: HTMLElement to append canvas to. Defaults to document body.
 
 ## methods
 
@@ -106,3 +109,4 @@ Note that x and y coordinates range from values 0 to 1. The t number is a relati
 ## Changes
 
 0.4.0 removed testing framework since I wasn't using it anyway.
+0.4.2 add config option of .element for the html element the canvas will be appended to.
