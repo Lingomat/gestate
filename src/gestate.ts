@@ -78,9 +78,8 @@ export class Gestate {
   }
 
   destroy() {
-    let body = document.querySelector('body')
-    body.removeChild(this.canvas)
-    //this.canvas.remove()
+    let element = this.appendElement ? this.appendElement : document.querySelector('body')
+    element.removeChild(this.canvas)
   }
  
   //
