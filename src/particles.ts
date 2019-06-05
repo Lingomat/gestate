@@ -20,7 +20,7 @@ export class Particles {
     this.canvas = canvas
     this.ctx = this.canvas.getContext('2d')
     this.ctx.globalCompositeOperation  = 'color'
-    this.colors = this.colors ? this.colors : this.getRandomColors(20)
+    this.colors = colors ? colors : this.getRandomColors(20)
   }
   
   begin(recordMode: boolean = false) {
