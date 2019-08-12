@@ -1,8 +1,8 @@
 import { Firework } from './firework'
 
 export class Particles {
-  MAX_PARTICLES: number = 500
-  FAST_PARTICLES: number = 500
+  MAX_PARTICLES: number = 250
+  FAST_PARTICLES: number = 250
   SPAWN_MIN: number = 3
   SPAWN_MAX: number = 5
   particles = []
@@ -59,9 +59,9 @@ export class Particles {
   }
 
   spawnParticles(x: number, y: number, vec: {x: number, y: number, t: number} = null ) {
-    if (!vec) {
-      return
-    }
+    // if (!vec) {
+    //   return // so we don't spaff the click spot too much
+    // }
     let mp = this.recordMode ? this.FAST_PARTICLES : this.MAX_PARTICLES
     if ( this.particles.length >= mp ) {
       this.particles.shift()
@@ -69,7 +69,7 @@ export class Particles {
     const firework = new Firework(
       x,
       y,
-      this.random( 3, 5 ),
+      this.random( 3, 6 ),
       this.randomPick(this.colors),
       vec
     )
@@ -152,7 +152,7 @@ export class Particles {
       }
       const minspawn = ~~(this.SPAWN_MIN/steps.length)
       const maxspawn = ~~(this.SPAWN_MAX/steps.length)
-      console.log('steps', elT,steps.length, minspawn, maxspawn)
+      //console.log('steps', elT,steps.length, minspawn, maxspawn)
       for (let s of steps) {
         let px = ~~(this.width*s.x), py = ~~(this.height*s.y)
         spawn(px, py, minspawn, maxspawn)

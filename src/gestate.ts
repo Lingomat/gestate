@@ -14,8 +14,9 @@ export class Gestate {
   //
   state: {
     isPlaying: boolean,
+    isVisualising: boolean
     isRecording: boolean
-  } = { isPlaying: false, isRecording: false}
+  } = { isPlaying: false, isVisualising: false, isRecording: false}
   currentGesture: Gesture = null
   currentGestureType: string = null
   currentRecording: {
@@ -86,13 +87,13 @@ export class Gestate {
   // Logic
   //
   record(element: HTMLElement, gtype: string, time: number): void {
-    this.consoleLog('gestate start()')
-    this.sourceElement = element
-    this.resizeCanvas()
-    this.state = {
-      isPlaying: false,
-      isRecording: true
+    if (this.state.isPlaying) {
+      this.consoleLog('call stopPlay() first.')
+      return
     }
+    this.consoleLog('gestate start()')
+    this.visualise(element)
+    this.state.isRecording = true
     this.currentGesture = null
     this.currentGestureType = gtype
     this.currentRecording = {
@@ -104,17 +105,33 @@ export class Gestate {
       movingPos: null,
       trackTouchIdentifier: null
     }
-    this.particles.begin(true)
-    this.recordTick()
   }
 
   stopRecord(): void {
     this.consoleLog('gestate stop()')
     this.state.isRecording = false
-    this.particles.stop()
+    this.stopVisualise()
     if (this.currentGesture) {
       this.finishCurrentGesture()
     }
+  }
+
+  visualise(element: HTMLElement): void {
+    this.consoleLog('gestate visualise()')
+    if (this.state.isVisualising) {
+      return
+    } else {
+      this.consoleLog('starting visualisation')
+      this.sourceElement = element
+      this.resizeCanvas()
+      this.state.isVisualising = true
+      this.particles.begin(true)
+      this.displayTick()
+    }
+  }
+  stopVisualise(): void {
+    this.particles.stop()
+    this.state.isVisualising = false
   }
  
   clearAll(): void {
@@ -135,6 +152,9 @@ export class Gestate {
     this.resizeCanvas()
     if (this.state.isRecording) {
       this.stopRecord()
+    }
+    if (this.state.isVisualising) {
+      this.stopVisualise()
     }
     this.currentRecording = {
       startTime: new Date(),
@@ -209,19 +229,22 @@ export class Gestate {
     }
   }
 
-  recordTick(): void {
+  displayTick(): void {
     if (this.currentTouch.movingPos) {
       this.particles.parp(this.currentTouch.movingPos.x, this.currentTouch.movingPos.y)
+      console.log('parp', this.currentTouch.movingPos)
     }
-    if (this.state.isRecording) {
-      window.requestAnimationFrame(this.recordTick.bind(this))
+    if (this.state.isVisualising) {
+      window.requestAnimationFrame(this.displayTick.bind(this))
     }
   }
   
   finishCurrentGesture(): void {
-    this.consoleLog('finishing gesture', this.currentGesture)
-    this.gestures.push(this.currentGesture)
-    this.currentGesture = null
+    if (this.state.isRecording) {
+      this.consoleLog('finishing gesture', this.currentGesture)
+      this.gestures.push(this.currentGesture)
+      this.currentGesture = null
+    }
     this.currentTouch.movingPos = null
     this.particles.endParp()
   }
@@ -241,36 +264,37 @@ export class Gestate {
         y: ry / rect.height
       }
     }
-    if (!this.state.isRecording) {
-      return
-    }
     if (e.type === 'touchstart') {
       let thisTouch: Touch = e.changedTouches[0]
       this.currentTouch.trackTouchIdentifier = thisTouch.identifier
       let touchPos = getXYFromTouch(thisTouch)
-      this.currentGesture = {
-        type: this.currentGestureType,
-        timeOffset: this.currentRecording.recTimeOffset + this.getElapsed(),
-        timeLine: [{
-          t: 0,
-          x: touchPos.x,
-          y: touchPos.y
-        }]
+      if (this.state.isRecording) {
+        this.currentGesture = {
+          type: this.currentGestureType,
+          timeOffset: this.currentRecording.recTimeOffset + this.getElapsed(),
+          timeLine: [{
+            t: 0,
+            x: touchPos.x,
+            y: touchPos.y
+          }]
+        }
       }
       this.currentTouch.movingPos = {x: touchPos.x, y: touchPos.y}
     } else if (e.type === 'touchmove') {
       let moveTouch = Array.from(e.changedTouches).find(x => x.identifier === this.currentTouch.trackTouchIdentifier)
       if (moveTouch) {
         let touchPos = getXYFromTouch(moveTouch)
-        this.currentGesture.timeLine.push({
-          t: this.currentRecording.recTimeOffset + this.getElapsed() - this.currentGesture.timeOffset,
-          x: touchPos.x,
-          y: touchPos.y
-        })
+        if (this.state.isRecording) {
+          this.currentGesture.timeLine.push({
+            t: this.currentRecording.recTimeOffset + this.getElapsed() - this.currentGesture.timeOffset,
+            x: touchPos.x,
+            y: touchPos.y
+          })
+        }
         this.currentTouch.movingPos = {x: touchPos.x, y: touchPos.y}
       }
     } else if (e.type === 'touchend') {
-      if (this.currentGesture) {
+      if (this.currentGesture || this.state.isVisualising) {
         let fidx = Array.from(e.changedTouches).findIndex(x => x.identifier === this.currentTouch.trackTouchIdentifier)
         if (fidx !== -1) {
           this.finishCurrentGesture()
@@ -293,28 +317,29 @@ export class Gestate {
     const mouseUp = () => {
       this.finishCurrentGesture()
     }
-    if (!this.state.isRecording) {
-      return
-    }
     if ((e.type === 'mousedown' || e.type === 'mouseenter') && (e.buttons & 1)) {
       let mPos = getXYFromMouse(e)
-      this.currentGesture = {
-        type: this.currentGestureType,
-        timeOffset: this.currentRecording.recTimeOffset + this.getElapsed(),
-        timeLine: [{
-          t: 0,
-          x: mPos.x,
-          y: mPos.y
-        }]
+      if (this.state.isRecording) {
+        this.currentGesture = {
+          type: this.currentGestureType,
+          timeOffset: this.currentRecording.recTimeOffset + this.getElapsed(),
+          timeLine: [{
+            t: 0,
+            x: mPos.x,
+            y: mPos.y
+          }]
+        }
       }
       this.currentTouch.movingPos = {x: mPos.x, y: mPos.y}
     } else if (e.type === 'mousemove' && this.currentTouch.movingPos) {
       let mPos = getXYFromMouse(e)
-      this.currentGesture.timeLine.push({
-        t: this.currentRecording.recTimeOffset + this.getElapsed() - this.currentGesture.timeOffset,
-        x: mPos.x,
-        y: mPos.y
-      })
+      if (this.state.isRecording) {
+        this.currentGesture.timeLine.push({
+          t: this.currentRecording.recTimeOffset + this.getElapsed() - this.currentGesture.timeOffset,
+          x: mPos.x,
+          y: mPos.y
+        })
+      }
       this.currentTouch.movingPos = {x: mPos.x, y: mPos.y}
     } else if (e.type === 'mouseup' && (!(e.buttons & 1))) {
       mouseUp()

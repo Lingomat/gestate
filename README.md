@@ -9,11 +9,22 @@ A raw gesture recording and playback library. It's primarily used in the Image-G
 
 ## API example
 
+Simple visualisation:
+
+```
+import { Gestate } from '@aikuma/gestate'
+const gest = new Gestate({debug: true})
+const ele = document.getElementById('image')
+gest.visualise(ele)
+```
+
+To record gestures:
+
 ```
 import { Gestate, Gesture } from '@aikuma/gestate'
 let gestures: Gesture[] = []
 const gest = new Gestate({debug: true})
-let ele = document.getElementById('image')
+const ele = document.getElementById('image')
 gest.record(ele, 'attention', 0)
 gest.stopRecording()
 gestures = gest.getGestures()
@@ -30,15 +41,17 @@ Optional config has three properties:
 * colors: string[] --- array of RGB colours to use for visualisation in format \#rrggbb.
 * element: HTMLElement to append canvas to. Defaults to document body.
 
+On constructing Gestate will create a new canvas and attach mouse and touch pointer events.
+
 ## methods
 
-`init()`
+`visualise()`
 
-Creates a canvas element with event listeners and attaches it to the body.
+Begin touch visualisation without recording gestures.
 
-`destroy()`
+`stopVisualise()`
 
-Removes the canvas element.
+Stop visualisation.
 
 `record(element: HTMLElement, type: string, time: number)`
 
@@ -75,6 +88,10 @@ Stops playback of gestures.
 `getGestures()`
 
 Returns an array of `Gesture` objects.
+
+`destroy()`
+
+Removes the canvas element.
 
 ## Gesture data structure
 

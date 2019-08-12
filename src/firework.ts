@@ -21,7 +21,7 @@ export class Firework {
     this.x = x
     this.y = y
     // vectors for waving motion
-    this.wander = this.random( 0.2, 1.0 )
+    this.wander = this.random( 0.1, 0.6 )
     // particles slow down
     this.drag = this.random( 0.85, 0.99 )
     // the direction 
@@ -50,7 +50,7 @@ export class Firework {
     this.vy += Math.cos( this.theta ) * 0.03
     this.vx *= this.drag
     this.vy *= this.drag
-    this.radius *= 0.97
+    this.radius *= 0.98
     this.alive = this.radius > 0.5
   }
   draw( ctx: CanvasRenderingContext2D ) {
