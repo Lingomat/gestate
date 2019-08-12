@@ -37,7 +37,7 @@ export class Gestate {
   appendElement: HTMLElement
   debug: boolean = false
   colors: string[] = null
-  constructor(config: any) {
+  constructor(config?: any) {
     this.debug = config && config.debug
     this.colors = (config && config.colors) ? config.colors : null
     this.appendElement = (config && config.element) ? config.element : null

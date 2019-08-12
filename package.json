@@ -1,6 +1,6 @@
 {
   "name": "@aikuma/gestate",
-  "version": "0.5.2",
+  "version": "0.5.5",
   "description": "Gestate gesture recording/playback library",
   "author": "Mat Bettinson (mat.bettinson@gmail.com)",
   "license": "MIT",
@@ -12,7 +12,7 @@
     "url": "git@github.com:aikuma/gestate.git"
   },
   "files": [
-    "dist/src"
+    "dist"
   ],
   "homepage": "https://github.com/aikuma/gestate#readme",
   "keywords": [
@@ -20,8 +20,8 @@
     "particles",
     "aikuma"
   ],
-  "main": "dist/src/index.js",
-  "browser": "dist/src/index.js",
+  "main": "dist/index.js",
+  "browser": "dist/index.js",
   "scripts": {
     "build": "tsc -d"
   },

@@ -59,6 +59,9 @@ export class Particles {
   }
 
   spawnParticles(x: number, y: number, vec: {x: number, y: number, t: number} = null ) {
+    if (!vec) {
+      return
+    }
     let mp = this.recordMode ? this.FAST_PARTICLES : this.MAX_PARTICLES
     if ( this.particles.length >= mp ) {
       this.particles.shift()
@@ -66,7 +69,7 @@ export class Particles {
     const firework = new Firework(
       x,
       y,
-      this.random( 4, 8 ),
+      this.random( 3, 5 ),
       this.randomPick(this.colors),
       vec
     )
@@ -139,6 +142,7 @@ export class Particles {
     // spawn(fx, fy, this.SPAWN_MIN, this.SPAWN_MAX)
     //  interpolate between last update (removed record distinction)
     let fc: number
+
     if (this.lastParp) {
       let elT = new Date().valueOf() - this.lastParp.time
       fc = 1 + ~~(60 / (1000/elT)) // scale steps to current frmme rate
@@ -146,9 +150,12 @@ export class Particles {
       if (steps.length > 1) {
         steps = steps.slice(1)
       }
+      const minspawn = ~~(this.SPAWN_MIN/steps.length)
+      const maxspawn = ~~(this.SPAWN_MAX/steps.length)
+      console.log('steps', elT,steps.length, minspawn, maxspawn)
       for (let s of steps) {
         let px = ~~(this.width*s.x), py = ~~(this.height*s.y)
-        spawn(px, py, this.SPAWN_MIN, this.SPAWN_MAX)
+        spawn(px, py, minspawn, maxspawn)
       }
     } else {
       fc = 1
@@ -163,9 +170,12 @@ export class Particles {
       d: new Date()
     }
   }
+  // called by finishCurrentGesture() following touch end
   endParp() {
     this.lastSpawn = null
+    this.lastParp = null
   }
+  // called by play routine when getCurrentGestureByTime(elapsed) returns null
   clearLastParp() {
     this.lastParp = null
   }
