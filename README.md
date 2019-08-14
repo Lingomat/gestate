@@ -1,11 +1,24 @@
 # Gestate
 
-A raw gesture recording and playback library. It's primarily used in the Image-Gesture-Voice activity to record gestures on image slides.
+Gestate is a library for visualising, capturing and playing back touch gestures primarily in support of knowledge performance, i.e. audiovisual presentations.
+The 'firework' visualisation is intended to be a more useful form of 'pointer' by integrating persistence and emphasizing motion by utilising particle effects that respond to the kinetics of touch input.
+Gestate is used in the more general [Image-Gesture-Voice](http://www.icsi.berkeley.edu/icsi/node/6052) documentary method based on capturing talk and gesture about a series of images.
 
 ### project features
- - Mirrors a given HTML element with a canvas overlay that captures mouse and touch events and ...
- - ... renders particle effects when recording and playing
- - Simple data structure of recorded gestures
+ - JavaScript module suitable for integrating with any web app
+ - Implements the firework pointer touch visualisation
+ - Captures touch (and mouse) events
+ - Plays captured events with the firework visualisation
+ - Visualisation is computationally inexpensive and suitable for mobile devices.
+
+### How it works?
+
+Gestate inserts a new HTML canvas element onto the page. 
+The size and position of the normatively transparent canvas is altered to overlay another HTML element such as an image.
+Mouse and touch events are registered on the canvas elements.
+Particle effects are displayed on mouse/touch input in visualisation mode or when recording and playing back gestures.
+The visualisation is decoupled from (high frequency) input events, using requestAnimationFrame.
+Where the framerate is less than 60Hz, interpolation is used to avoid large gaps.
 
 ## API example
 
@@ -107,11 +120,16 @@ A Gesture object has a timeOffset property representing the relative time of the
 
 Note that x and y coordinates range from values 0 to 1. The t number is a relative time offset in Milliseconds from the Gesture timeOffset value.
 
+## Compiling source
+
+This is a Typescript project so just `npm i` to install the dependencies and then `tsc -d` to compile. Plain JavaScript is now in the `dist` folder, i.e. import { Gestate } from 'path/gestate/dist'.
+
 ## To do
 
-1. Add some settings for particle effects.
+1. Expose particle movement settings to allow tweaking the effect.
 
 ## Changes
 
 0.4.0 removed testing framework since I wasn't using it anyway.
 0.4.2 add config option of .element for the html element the canvas will be appended to.
+0.6.0 many bugs fixed, visualisation mode (without recording) added
