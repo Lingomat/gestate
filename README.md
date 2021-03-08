@@ -53,6 +53,7 @@ Optional config has three properties:
 * debug: boolean --- print debug information
 * colors: string[] --- array of RGB colours to use for visualisation in format \#rrggbb.
 * element: HTMLElement to append canvas to. Defaults to document body.
+* tapthresh: number --- time (ms) threadhold for tap duration detection, default 110.
 
 On constructing Gestate will create a new canvas and attach mouse and touch pointer events.
 
@@ -133,3 +134,4 @@ This is a Typescript project so just `npm i` to install the dependencies and the
 0.4.0 removed testing framework since I wasn't using it anyway.
 0.4.2 add config option of .element for the html element the canvas will be appended to.
 0.6.0 many bugs fixed, visualisation mode (without recording) added
+0.7.0 tap visualisation
